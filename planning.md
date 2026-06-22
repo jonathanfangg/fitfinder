@@ -1,4 +1,4 @@
-# FitFindr — planning.md
+# fitfinder
 
 ---
 

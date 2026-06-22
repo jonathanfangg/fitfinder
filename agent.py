@@ -1,7 +1,7 @@
 """
 agent.py
 
-The FitFindr planning loop. Orchestrates the three tools in response to a
+The fitfinder planning loop. Orchestrates the three tools in response to a
 natural language user query, passing state between them via a session dict.
 
 Complete tools.py and test each tool in isolation before implementing this file.
@@ -51,7 +51,7 @@ def _new_session(query: str, wardrobe: dict) -> dict:
 
 def run_agent(query: str, wardrobe: dict) -> dict:
     """
-    Main agent entry point. Runs the FitFindr planning loop for a single
+    Main agent entry point. Runs the fitfinder planning loop for a single
     user interaction and returns the completed session dict.
 
     Args:
