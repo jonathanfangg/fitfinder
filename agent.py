@@ -96,15 +96,50 @@ def run_agent(query: str, wardrobe: dict) -> dict:
     """
     session = _new_session(query, wardrobe)
 
-    price_match = re.search(r"\$?(\d+(?:\.\d+)?)\s*(?:dollars?)?", query, re.IGNORECASE)
-    size_match = re.search(r"\bsize\s+([A-Z0-9/]+)\b", query, re.IGNORECASE)
+    if not query or not query.strip():
+        session["error"] = "Please describe what kind of item you are looking for."
+        return session
+
+    query_text = query.strip()
+
+    price_match = re.search(
+        r"(?:under|below|less than|max|maximum|up to)\s*\$?(\d+(?:\.\d+)?)",
+        query_text,
+        re.IGNORECASE,
+    )
+    if not price_match:
+        price_match = re.search(r"\$(\d+(?:\.\d+)?)", query_text)
 
     max_price = float(price_match.group(1)) if price_match else None
+
+    size_match = re.search(
+        r"\b(?:size|in size)\s+([A-Z0-9/]+)\b",
+        query_text,
+        re.IGNORECASE,
+    )
     size = size_match.group(1).upper() if size_match else None
 
-    clean = re.sub(r"(under\s+)?\$?\d+(?:\.\d+)?\s*(dollars?)?", "", query, flags=re.IGNORECASE)
-    clean = re.sub(r"\bsize\s+[A-Z0-9/]+\b", "", clean, flags=re.IGNORECASE)
-    description = " ".join(clean.split())
+    description = query_text
+    description = re.sub(
+        r"(?:under|below|less than|max|maximum|up to)\s*\$?\d+(?:\.\d+)?",
+        "",
+        description,
+        flags=re.IGNORECASE,
+    )
+    description = re.sub(r"\$\d+(?:\.\d+)?", "", description)
+    description = re.sub(r"\b(?:size|in size)\s+[A-Z0-9/]+\b", "", description, flags=re.IGNORECASE)
+    description = re.sub(
+        r"\b(i'?m looking for|looking for|find me|i want|what's out there)\b",
+        "",
+        description,
+        flags=re.IGNORECASE,
+    )
+    style_split = re.split(
+        r"\b(i mostly wear|how would i style it|how should i style it|what would i wear with it)\b",
+        description,
+        flags=re.IGNORECASE,
+    )
+    description = " ".join(style_split[0].replace(".", " ").replace(",", " ").split())
 
     session["parsed"] = {"description": description, "size": size, "max_price": max_price}
 
@@ -122,7 +157,15 @@ def run_agent(query: str, wardrobe: dict) -> dict:
 
     session["outfit_suggestion"] = suggest_outfit(results[0], wardrobe)
 
+    if not session["outfit_suggestion"] or not session["outfit_suggestion"].strip():
+        session["error"] = "I found a listing, but could not generate an outfit suggestion for it."
+        return session
+
     session["fit_card"] = create_fit_card(session["outfit_suggestion"], results[0])
+
+    if not session["fit_card"] or not session["fit_card"].strip():
+        session["error"] = "I found and styled a listing, but could not generate a fit card."
+        return session
 
     return session
 
@@ -130,7 +173,7 @@ def run_agent(query: str, wardrobe: dict) -> dict:
 # ── CLI test ──────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    from utils.data_loader import get_example_wardrobe, get_empty_wardrobe
+    from utils.data_loader import get_example_wardrobe
 
     print("=== Happy path: graphic tee ===\n")
     session = run_agent(
