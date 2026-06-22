@@ -31,30 +31,30 @@ def test_search_returns_list_on_no_match():
 
 def test_suggest_outfit_with_wardrobe():
     wardrobe = get_example_wardrobe()
-    item = search_listings("vintage tee", size=None, max_price=50)
-    if item:
-        result = suggest_outfit(item[0], wardrobe)
-        assert isinstance(result, str)
-        assert len(result) > 0
+    items = search_listings("vintage tee", size=None, max_price=50)
+    assert items, "Expected at least one matching item for 'vintage tee'"
+    result = suggest_outfit(items[0], wardrobe)
+    assert isinstance(result, str)
+    assert len(result) > 0
 
 
 def test_suggest_outfit_empty_wardrobe():
     wardrobe = get_empty_wardrobe()
-    item = search_listings("jacket", size=None, max_price=100)
-    if item:
-        result = suggest_outfit(item[0], wardrobe)
-        assert isinstance(result, str)
-        assert len(result) > 0
+    items = search_listings("jacket", size=None, max_price=100)
+    assert items, "Expected at least one matching item for 'jacket'"
+    result = suggest_outfit(items[0], wardrobe)
+    assert isinstance(result, str)
+    assert len(result) > 0
 
 
 def test_create_fit_card_returns_string():
-    item = search_listings("vintage tee", size=None, max_price=50)
-    if item:
-        wardrobe = get_example_wardrobe()
-        outfit = suggest_outfit(item[0], wardrobe)
-        card = create_fit_card(outfit, item[0])
-        assert isinstance(card, str)
-        assert len(card) > 0
+    items = search_listings("vintage tee", size=None, max_price=50)
+    assert items, "Expected at least one matching item for 'vintage tee'"
+    wardrobe = get_example_wardrobe()
+    outfit = suggest_outfit(items[0], wardrobe)
+    card = create_fit_card(outfit, items[0])
+    assert isinstance(card, str)
+    assert len(card) > 0
 
 
 def test_create_fit_card_empty_outfit():

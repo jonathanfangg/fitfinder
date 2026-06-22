@@ -83,7 +83,9 @@ def suggest_outfit(new_item: dict, wardrobe: dict) -> str:
         )
     else:
         wardrobe_text = "\n".join(
-            f"- {w.get('name', '')} ({w.get('category', '')}, {', '.join(w.get('colors', []))})"
+            f"- {w.get('name', '')} "
+            f"({w.get('category', '')}, colors: {', '.join(w.get('colors', []))}, "
+            f"style: {', '.join(w.get('style_tags', []))}, notes: {w.get('notes', '')})"
             for w in wardrobe_items
         )
         prompt = (
@@ -93,13 +95,16 @@ def suggest_outfit(new_item: dict, wardrobe: dict) -> str:
             "from their wardrobe. Name the wardrobe pieces you're pairing it with and explain the vibe."
         )
 
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.8,
-    )
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.8,
+        )
+        result = (response.choices[0].message.content or "").strip()
+    except Exception:
+        result = ""
 
-    result = (response.choices[0].message.content or "").strip()
     if not result:
         return (
             "I could not generate a personalized outfit from the wardrobe, but this item would "
@@ -132,13 +137,16 @@ def create_fit_card(outfit: str, new_item: dict) -> str:
         "Mention the item name, price, and platform once each. No hashtags."
     )
 
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=1.2,
-    )
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=1.2,
+        )
+        result = (response.choices[0].message.content or "").strip()
+    except Exception:
+        result = ""
 
-    result = (response.choices[0].message.content or "").strip()
     if not result:
         return "Could not generate a fit card caption."
     return result
