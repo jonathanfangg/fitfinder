@@ -1,7 +1,7 @@
 """
 app.py
 
-Gradio interface for FitFindr. The layout and wiring are already set up —
+Gradio interface for fitfinder. The layout and wiring are already set up —
 your job is to fill in handle_query() so it calls run_agent() and maps
 the session results to the three output panels.
 
@@ -79,9 +79,9 @@ EXAMPLE_QUERIES = [
 ]
 
 def build_interface():
-    with gr.Blocks(title="FitFindr") as demo:
+    with gr.Blocks(title="fitfinder") as demo:
         gr.Markdown("""
-# FitFindr 🛍️
+# fitfinder 🛍️
 Find secondhand pieces and get outfit ideas based on your wardrobe.
 Describe what you're looking for — include size and price if you want to filter.
         """)
